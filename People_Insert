@@ -1,0 +1,59 @@
+USE [People]
+GO
+/****** Object:  StoredProcedure [dbo].[People_Insert]    Script Date: 8/16/2018 3:38:58 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROC [dbo].[People_Insert]
+
+@Id int output,
+@FirstName nvarchar(50),
+@MiddleInitial nchar(1),
+@LastName nvarchar(50),
+@DateOfBirth date,
+@ModifiedBy nvarchar(128)
+
+AS
+/*
+DECLARE
+	@_id int,
+	@_firstName nvarchar(50) = 'Grethel',
+	@_middleInitial nchar(1) = 'I',
+	@_lastName nvarchar(50) = 'Sorry',
+	@_dateOfBirth date = '1987-09-11',
+	@_createdDate DATETIME2(7) = getdate(),
+	@_modifiedDate DATETIME2(7) = getdate(),
+	@_modifiedBy nvarchar(128) = 'Samuel'
+EXECUTE [dbo].[People_Insert]
+	@_id,
+	@_firstName,
+	@_middleInitial,
+	@_lastName,
+	@_dateOfBirth,
+	@_modifiedBy
+SELECT * FROM [dbo].[People] where Id = @_id;
+SELECT * FROM [dbo].[People];
+*/
+	BEGIN
+		INSERT INTO 
+			[dbo].[People]
+			(
+			FirstName ,
+			MiddleInitial,
+			LastName,
+			DateOfBirth,
+			ModifiedBy
+			)
+		VALUES
+			(
+			@FirstName,
+			@MiddleInitial,
+			@LastName,
+			@DateOfBirth,
+			@ModifiedBy
+			)
+		SET
+			@Id = SCOPE_IDENTITY();
+
+	END
