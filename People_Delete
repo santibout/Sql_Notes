@@ -1,0 +1,23 @@
+USE [People]
+GO
+/****** Object:  StoredProcedure [dbo].[People_Delete]    Script Date: 8/16/2018 3:40:03 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROC [dbo].[People_Delete]
+
+@Id int
+
+AS
+/*	
+EXECUTE [dbo].[People_Delete] @Id = 6
+SELECT * FROM [dbo].[People];
+*/
+	BEGIN
+		DELETE
+			FROM
+				[dbo].[People]
+			WHERE 
+				Id = @Id
+	END
