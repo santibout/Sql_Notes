@@ -1,0 +1,31 @@
+USE [People]
+GO
+/****** Object:  StoredProcedure [dbo].[People_SelectById]    Script Date: 8/16/2018 3:34:47 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROC [dbo].[People_SelectById]
+@Id int
+/*
+EXECUTE [dbo].[People_SelectById] @Id = 1
+*/
+AS
+	BEGIN
+
+		SELECT 
+			[Id],
+			[FirstName],
+			[MiddleInitial],
+			[LastName],
+			[DateOfBirth],
+			[CreatedDate],
+			[ModifiedDate],
+			[ModifiedBy]
+		FROM
+			[dbo].[People]
+		WHERE 
+			Id = @Id
+END
+
+
