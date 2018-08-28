@@ -1,0 +1,199 @@
+CREATE TABLE employee
+(
+	emp_id INT PRIMARY KEY
+	, first_name VARCHAR(40)
+	, last_name VARCHAR(40)
+	, birth_date DATE
+	, sex CHAR
+	, salary INT
+	, super_id INT
+	, branch_id INT
+);
+
+CREATE TABLE branch
+(
+	branch_id INT PRIMARY KEY
+	, branch_name VARCHAR(20)
+	, mgr_id INT
+	, mgr_start_date DATE
+	FOREIGN KEY(mgr_id) REFERENCES employee(emp_id) ON DELETE SET NULL
+);
+
+ALTER TABLE employee
+ADD FOREIGN KEY(branch_id)
+REFERENCES branch(branch_id)
+ON DELETE SET NULL;
+
+ALTER TABLE employee
+ADD FOREIGN KEY (super_id)
+REFERENCES employee(emp_id) 
+ON DELETE SET NULL;
+
+CREATE TABLE client
+(
+	client_id INT PRIMARY KEY
+	, client_name VARCHAR(40)
+	, branch_id INT
+	FOREIGN KEY(branch_id) REFERENCES branch(branch_id) ON DELETE SET NULL
+);
+
+CREATE TABLE works_with
+(
+	emp_id INT 
+	, client_id INT 
+	, total_sales INT
+	, PRIMARY KEY(emp_id, client_id)
+	, FOREIGN KEY(emp_id) REFERENCES employee(emp_id) ON DELETE CASCADE
+	, FOREIGN KEY(client_id) REFERENCES client(client_id) ON DELETE CASCADE
+);
+
+CREATE TABLE branch_supplier
+(
+	branch_id INT
+	, supplier_name VARCHAR(40)
+	, supply_type VARCHAR(40)
+	PRIMARY KEY(supplier_name, supply_type)
+	FOREIGN KEY(branch_id) REFERENCES branch(branch_id) ON DELETE CASCADE
+);
+
+INSERT INTO employee VALUES(100, 'David', 'Wallace', '1967-11-17', 'M', 25000, NULL, NULL);
+
+INSERT INTO branch VALUES(1, 'Corporate', 100, '2006-02-09');
+
+UPDATE employee SET branch_id = 1 WHERE emp_id = 100;
+
+INSERT INTO employee VALUES	(101, 'Jan', 'Levinson', '1961-05-11', 'F', 110000, 100, 1);
+
+UPDATE employee SET salary = 250000 WHERE emp_id = 100;
+
+
+-- FIND ALL EMPLOYEES
+SELECT * FROM employee
+
+-- FIND ALL CLIENTS
+SELECT * FROM client
+
+-- FIND EMPLOYESS ORDERED BY SALARY
+SELECT * FROM employee ORDER BY salary DESC
+
+-- FIND ALL EMPLOYEES ORDERED BY SEX THEN NAME
+	SELECT * FROM employee ORDER BY sex, first_name, last_name
+
+-- FIND THE FIRST FIVE EMPLOYEES IN THE TABLE
+SELECT TOP 5 * FROM employee 
+
+-- FIND FIRST AND LAST NAME OF ALL EMPLOYEES
+SELECT first_name, last_name FROM employee
+
+-- FIND FORENAME AND SURNAME OF ALL EMPLOYEES
+SELECT first_name as forename, last_name as surname FROM employee
+
+-- FIND OUT ALL THE DIFFERENT GENDERS
+SELECT DISTINCT sex from employee
+
+-- FIND THE NUMBER OF EMPLOYEES
+SELECT COUNT(emp_id) FROM employee
+
+--  FIND ALL EMPLOYEES WHO HAVE SUPER VISORS
+SELECT COUNT(super_id) FROM employee
+
+-- FIND NUMBER OF FEMALE EMPLOYEES BORN AFTER 1970
+SELECT first_name, sex, birth_date FROM employee WHERE sex = 'F' and birth_date > '1970'
+
+-- FIND AVERAGE OF ALL EMPLOYEE SALARIES
+SELECT AVG(salary) as Average_Salary FROM employee
+--Who are Male
+WHERE sex = 'M';
+
+select avg(salary) average_salary, sex from employee group by sex
+
+-- FIND SUM OF ALL EMPLOYEE'S SALARIES MALES VS FEMALES
+SELECT sex as sex, SUM(salary) as Total_Earned FROM employee GROUP BY sex  ORDER BY SUM(salary) DESC
+
+-- FIND OUT HOW MANY MALES AND HOW MANY FEMALES THERE ARE
+SELECT COUNT(emp_id) as Count, sex FROM employee GROUP BY sex
+
+-- FIND THE TOTAL SALES OF EACH SALESMAN
+SELECT SUM(total_sales) as Total_Sales, employee.first_name FROM works_with JOIN employee ON employee.emp_id = works_with.emp_id GROUP BY employee.first_name
+
+-- FIND OUT HOW MUCH EACH CLIENT SPENT
+SELECT client.client_name as client, SUM(works_with.total_sales) as Spent
+ FROM works_with JOIN client ON works_with.client_id = client.client_id
+ GROUP BY client.client_name 
+ ORDER BY SUM(works_with.total_sales)DESC
+
+ -- FIND ANY CLIENTS WHO ARE AN LLC
+ SELECT * FROM client WHERE client_name like '%LLC%'; -- % means anything number of characters, and _ means one character
+
+ --FIND ANY BRANCH SUPPLIERS WHO ARE IN THE LABEL BUISNESS
+ SELECT * FROM branch_supplier WHERE supplier_name LIKE '%LABEL%'
+
+ UPDATE branch_supplier SET supplier_name = 'Stamford Labels' WHERE supplier_name = 'Stamford Lables'
+
+ -- FIND ALL EMPLOYEES WHO WERE BORN IN OCTOBER
+ SELECT * FROM employee WHERE birth_date LIKE '____-10-%'
+
+ -- FIND ANY CLIENTS WHO ARE A SCHOOL
+SELECT * FROM client WHERE client_name LIKE '%SCHOOL%'
+ 
+-- FIND A LIST OF EMPLOYEES AND BRANCH NAMES
+SELECT first_name FROM employee UNION SELECT branch_name FROM branch
+SELECT distinct branch_name, first_name FROM branch JOIN employee on branch.branch_id = employee.branch_id
+
+-- FIND A LIST OF ALL CLIENTS AND BRANCH SUPPLIERS NAME
+SELECT client_name, branch_id FROM client UNION SELECT supplier_name, branch_id FROM branch_supplier
+SELECT client_name, supplier_name FROM client JOIN branch_supplier ON client.branch_id = branch_supplier.branch_id
+
+-- FIND	 A LIST OF ALL THE MONEY SPENT OR EARNED BY THE COMPANY
+SELECT salary FROM employee UNION SELECT total_sales FROM works_with
+SELECT SUM(total_sales), first_name FROM works_with JOIN employee on works_with.emp_id = employee.emp_id GROUP BY employee.first_name
+
+-- FIND ALL BRANCHES AND THE NAMES OF THEIR MANAGERS
+SELECT branch_name, first_name FROM branch JOIN employee ON mgr_id = emp_id
+
+-- FIND NAMES OF ALL EMPLOYEES WHO HAVE SOLD OVER 30000 TO A SINGLE CLIENT
+SELECT first_name , last_name FROM employee 
+WHERE employee.emp_id
+IN 
+(
+SELECT works_with.emp_id FROM works_with WHERE works_with.total_sales > 30000
+);
+
+-- FIND ALL CLIENTS WHO ARE HANDLED BY THE BRANCH THAT MICHEAL SCOTT MANAGES ASSUME YOU KNOW MICHEALS ID
+SELECT * FROM works_with
+
+SELECT client.client_name FROM client
+where client.branch_id IN
+(
+	SELECT TOP 1 branch.branch_id FROM branch WHERE branch.mgr_id = 102
+	
+);
+
+delete employee where emp_id = 102
+
+--CREATE TABLE Trigger_Test
+--(
+--message VARCHAR(100)
+--);
+
+
+ALTER
+TRIGGER Trigger_Test1
+	ON employee
+	INSTEAD OF
+	INSERT
+	AS
+		INSERT Trigger_Test VALUES ()
+GO
+
+
+INSERT INTO employee VALUES (112, 'Jack', 'Spader', '1987-01-23', 'M', 100000, 102, 2)
+select * from Trigger_Test
+select * from employee
+
+ALTER TRIGGER trig_name 
+ON { table_name | view_name } 
+{ FOR | AFTER | INSTEAD OF } 
+{ [ INSERT ] [ , ] [ UPDATE ] [ , ] [ DELETE ] } 
+AS { sql_statement [ ; ] } 
+GO
