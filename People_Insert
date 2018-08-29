@@ -18,9 +18,9 @@ AS
 /*
 DECLARE
 	@_id int,
-	@_firstName nvarchar(50) = 'Grethel',
+	@_firstName nvarchar(50) = 'Samuel',
 	@_middleInitial nchar(1) = 'I',
-	@_lastName nvarchar(50) = 'Sorry',
+	@_lastName nvarchar(50) = 'Santibout',
 	@_dateOfBirth date = '1987-09-11',
 	@_createdDate DATETIME2(7) = getdate(),
 	@_modifiedDate DATETIME2(7) = getdate(),
